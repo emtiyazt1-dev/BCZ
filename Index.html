@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VaultSpace — Save • Manage • Grow | Personal Banking & Hisab Saver</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        script: ['Caveat', 'cursive'],
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --bg-canvas: #040907;
+            --bg-surface: #09130f;
+            --bg-card: #0c1813;
+            --bg-elevated: #11221b;
+            --text-primary: #f4fbf8;
+            --text-secondary: #8ba69a;
+            --border-subtle: rgba(52, 211, 153, 0.14);
+        }
+
+        html.light-mode {
+            --bg-canvas: #eef6f2;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-elevated: #f3faf6;
+            --text-primary: #071912;
+            --text-secondary: #4b6b5d;
+            --border-subtle: rgba(16, 185, 129, 0.25);
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            background-image:
+                radial-gradient(circle at 15% 8%, rgba(16, 185, 129, 0.16) 0%, transparent 38%),
+                radial-gradient(circle at 85% 12%, rgba(5, 150, 105, 0.14) 0%, transparent 42%),
+                radial-gradient(circle at 50% 95%, rgba(16, 185, 129, 0.08) 0%, transparent 45%);
+        }
+
+        .vs-surface {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .vs-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.55);
+        }
+
+        html.light-mode .vs-card {
+            box-shadow: 0 10px 28px -12px rgba(6, 78, 59, 0.14);
+        }
+
+        .vs-muted {
+            color: var(--text-secondary);
+        }
+
+        .emerald-hero-card {
+            background: linear-gradient(125deg, #042f20 0%, #065f46 48%, #059669 100%);
+            box-shadow: 0 18px 40px -12px rgba(16, 185, 129, 0.35);
+        }
+
+        .emerald-active-nav {
+          background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            color: #ffffff !important;
+            box-shadow: 0 8px 22px -6px rgba(16, 185, 129, 0.55);
+        }
+
+        .premium-card-bg {
+            background: radial-gradient(circle at 85% 20%, rgba(52, 211, 153, 0.24) 0%, transparent 50%),
+                        linear-gradient(160deg, #071912 0%, #0d2b1f 55%, #06150f 100%);
+            border: 1px solid rgba(52, 211, 153, 0.28);
+        }
+
+        .refer-banner-bg {
+            background: linear-gradient(95deg, #052e20 0%, #065f46 52%, #047857 100%);
+            border: 1px solid rgba(52, 211, 153, 0.32);
+        }
+
+        /* 3D Virtual Card Themes */
+        .v-card-emerald {
+            background: linear-gradient(135deg, #042419 0%, #065f46 52%, #10b981 100%);
+        }
+        .v-card-gold {
+            background: linear-gradient(135deg, #1e1605 0%, #78350f 52%, #d97706 100%);
+        }
+        .v-card-crimson {
+            background: linear-gradient(135deg, #22060e 0%, #881337 52%, #e11d48 100%);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.28);
+            border-radius: 9999px;
+        }
+
+        /* Official Seal Ink Styles */
+        .seal-ink-blue { color: #1d4ed8; }
+        .seal-ink-emerald { color: #047857; }
+        .seal-ink-crimson { color: #b91c1c; }
+
+        /* Print Rules for A4 Official E-Statement */
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #printable-statement-sheet,
+            #printable-statement-sheet * {
+                visibility: visible !important;
+            }
+            #printable-statement-sheet {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                box-shadow: none !important;
+                border: none !important;
+                z-index: 99999 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+    <!-- Toast Container -->
+    <div id="toast-box" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+    <!-- App Shell -->
+    <div class="min-h-screen flex flex-col lg:flex-row max-w-[1600px] mx-auto">
+
+        <!-- ========================================================= -->
+        <!-- LEFT SIDEBAR NAVIGATION (250px Desktop, Drawer Mobile)    -->
+        <!-- ========================================================= -->
+        <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-[258px] shrink-0 vs-surface border-r flex flex-col justify-between p-4 transition-transform duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto no-print">
+            <div>
+                <!-- Brand Emblem Header -->
+                <div class="pb-4 mb-3 border-b border-emerald-500/15">
+                    <div class="flex items-center justify-between">
+                        <button onclick="openModal('brand-logo-modal')" class="flex items-center gap-3 text-left group w-full">
+                            <div class="w-12 h-12 rounded-2xl bg-[#050d0a] border border-emerald-400/30 flex items-center justify-center shadow-lg shadow-emerald-950/60 group-hover:scale-105 transition shrink-0">
+                                <span id="sidebar-emblem-slot"></span>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xl font-black tracking-tight leading-none flex items-center">
+                                    <span>Vault</span><span class="text-emerald-400">Space</span>
+                                    <span class="text-[9px] font-bold text-emerald-300/80 ml-0.5 -mt-2">TM</span>
+                                </div>
+                                <div class="text-[10px] font-semibold tracking-wider text-emerald-300/90 mt-1">
+                                    Save • Manage • Grow
+                                </div>
+                            </div>
+                        </button>
+                        <button onclick="toggleMobileSidebar(false)" class="lg:hidden p-1.5 rounded-lg vs-muted hover:text-white">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Primary Navigation Menu -->
+                <nav id="sidebar-nav-list" class="space-y-1 text-[13px] font-medium">
+                    <!-- Populated via JS for active state management -->
+                </nav>
+
+                <!-- Go Premium Sidebar Card -->
+                <div class="mt-4 p-3.5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-[#0a2219] to-amber-950/40 border border-amber-400/25 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300">
+                            <i data-lucide="crown" class="w-4 h-4 text-amber-400 fill-amber-400/30"></i>
+                            Go Premium
+                        </span>
+                        <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-[9px] font-bold text-emerald-300 uppercase">PRO</span>
+                    </div>
+                    <p class="text-[11px] vs-muted leading-snug">Unlock more features, unlimited jars & zero fee transfers.</p>
+                    <button onclick="openModal('premium-modal')" class="w-full py-2 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-emerald-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md hover:brightness-105 transition">
+                        Upgrade Now <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom User Profile Pill & Logout/Switch -->
+            <div class="pt-4 mt-4 border-t border-emerald-500/15 space-y-2">
+                <button onclick="openModal('profile-modal')" class="w-full p-2.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 flex items-center gap-2.5 text-left transition">
+                    <div id="sidebar-user-avatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-300 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
+                        ET
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div id="sidebar-user-name" class="text-xs font-bold truncate">Hi, Emtiyaz T</div>
+                        <div class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                            Premium Member <i data-lucide="badge-check" class="w-3 h-3 text-emerald-400"></i>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="switchActiveAccount()" class="w-full px-3 py-2 rounded-xl vs-muted hover:text-rose-400 hover:bg-rose-500/10 text-xs font-medium flex items-center gap-2 transition">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <span>Logout / Switch Account</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ========================================================= -->
+        <!-- MAIN WORKSPACE COLUMN                                     -->
+        <!-- ========================================================= -->
+        <div class="flex-1 min-w-0 flex flex-col justify-between">
+
+            <div class="p-4 sm:p-6 space-y-5">
+                <!-- TOP SEARCH & UTILITY BAR -->
+                <header class="flex items-center justify-between gap-3 no-print">
+                    <div class="flex items-center gap-2.5 flex-1 max-w-md">
+                        <button onclick="toggleMobileSidebar(true)" class="lg:hidden p-2.5 rounded-xl vs-card text-emerald-400">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="w-4 h-4 vs-muted absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input id="global-search-input" type="text" oninput="handleGlobalSearch(this.value)" placeholder="Search anything..." class="w-full pl-10 pr-4 py-2.5 rounded-full vs-card text-xs sm:text-sm placeholder:text-slate-500 focus:outline-none focus:border-emerald-400/60 transition" />
+                        </div>
+                    </div>
+                          <div class="flex items-center gap-2 sm:gap-2.5">
+                        <!-- Primary Currency Quick Pill (BDT ৳ / SAR ﷼) -->
+                        <button onclick="toggleCurrency()" title="Toggle Primary Currency (BDT / SAR)" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full vs-card text-xs font-mono font-bold text-emerald-400 hover:border-emerald-400/50 transition">
+                            <span id="top-currency-label">BDT ৳</span>
+                            <i data-lucide="repeat" class="w-3.5 h-3.5 vs-muted"></i>
+                        </button>
+
+                        <!-- Notifications Bell with Badge -->
+                        <div class="relative">
+                            <button onclick="toggleNotificationsPopover()" class="p-2.5 rounded-full vs-card hover:border-emerald-400/50 transition relative">
+                                <i data-lucide="bell" class="w-4 h-4 text-emerald-300"></i>
+                                <span id="notif-badge-count" class="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">2</span>
+                            </button>
+                            <div id="notifications-popover" class="hidden absolute right-0 mt-2 w-72 rounded-2xl vs-card p-3.5 z-40 space-y-2.5 shadow-2xl">
+                                <div class="flex items-center justify-between border-b border-emerald-500/15 pb-2">
+                                    <span class="text-xs font-bold">Notifications</span>
+                                    <button onclick="markNotificationsRead()" class="text-[10px] text-emerald-400 font-semibold hover:underline">Mark read</button>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                        <div class="font-semibold text-emerald-300">Received +৳ 2,000</div>
+                                        <div class="text-[10px] vs-muted">VaultSpace instant credit verified</div>
+                                    </div>
+                                    <div class="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                                        <div class="font-semibold text-amber-300">Goal Milestone: 65%</div>
+                                        <div class="text-[10px] vs-muted">Buy iPhone 17 Jar is at ৳ 65,000</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dark / Light Theme Mode Switcher -->
+                        <button onclick="toggleThemeMode()" id="theme-mode-btn" title="Switch Dark / Light Mode" class="p-2.5 rounded-full vs-card hover:border-emerald-400/50 transition">
+                            <i id="theme-mode-icon" data-lucide="moon" class="w-4 h-4 text-emerald-300"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Search Results Quick Bar (Visible when typing in Search anything...) -->
+                <div id="search-results-panel" class="hidden vs-card rounded-2xl p-4 space-y-2 border-emerald-400/40 no-print">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Quick Search Matches</span>
+                        <button onclick="clearGlobalSearch()" class="text-xs vs-muted hover:text-white">Clear</button>
+                    </div>
+                    <div id="search-results-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs"></div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- VIEW A: MAIN COMMAND DASHBOARD (DEFAULT)                  -->
+                <!-- ========================================================= -->
+                <section id="view-dashboard" class="space-y-5">
+
+                    <!-- HERO WELCOME BANNER -->
+                    <div class="vs-card rounded-3xl p-4 sm:p-5 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style="background: linear-gradient(105deg, rgba(6,78,59,0.45) 0%, rgba(9,19,15,0.92) 55%, rgba(16,185,129,0.22) 100%);">
+                        <div class="flex items-center gap-3.5 sm:gap-4 z-10">
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#040d09]/90 border border-emerald-400/35 flex items-center justify-center shadow-xl shadow-emerald-950/70 shrink-0">
+                                <span id="hero-emblem-slot"></span>
+                            </div>
+                            <div>
+                                <h1 id="hero-greeting-title" class="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2">
+                                    Hi, Emtiyaz T <span class="text-2xl">👋</span>
+                                </h1>
+                                <p class="text-xs sm:text-sm vs-muted mt-0.5">Let's make your money work smarter!</p>
+                            </div>
+                        </div>
+
+                        <!-- Right Hero Quote Pill + Rising Emerald Growth Chart -->
+                        <div class="flex items-center gap-3 sm:gap-4 self-end md:self-center z-10">
+                            <div class="px-3.5 py-2 rounded-2xl bg-[#06140e]/85 border border-emerald-400/25 text-xs font-semibold leading-snug">
+                                <span class="block">“Dream Big,</span>
+                                <span class="inline-flex items-center gap-1 text-emerald-300">Save Smart <span class="text-emerald-400">♥</span></span>
+                            </div>
+                            <!-- Rising Growth Mini Chart -->
+                            <div class="w-28 sm:w-32 h-14 rounded-2xl bg-[#05120c]/80 border border-emerald-400/20 p-2 flex items-end justify-between gap-1">
+                                <div class="w-2.5 h-3 rounded-t bg-emerald-500/35"></div>
+                                <div class="w-2.5 h-5 rounded-t bg-emerald-500/50"></div>
+                                <div class="w-2.5 h-7 rounded-t bg-emerald-500/65"></div>
+                                <div class="w-2.5 h-9 rounded-t bg-emerald-400/80"></div>
+                                <svg viewBox="0 0 60 36" class="w-12 h-10 overflow-visible">
+                                    <polyline fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="2,32 18,24 32,27 48,10 56,5" />
+                                    <polygon fill="url(#heroGrowthGrad)" opacity="0.35" points="2,32 18,24 32,27 48,10 56,5 56,35 2,35" />
+                                    <defs>
+                                        <linearGradient id="heroGrowthGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#34d399" />
+                                            <stop offset="100%" stop-color="transparent" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                        <!-- 2-COLUMN COMMAND GRID: Center Main (8 cols) + Right Column (4 cols) -->
+                    <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+
+                        <!-- CENTER MAIN COLUMN (8 cols) -->
+                        <div class="xl:col-span-8 space-y-5">
+
+                            <!-- 1. EMERALD TOTAL BALANCE CARD -->
+                            <div class="emerald-hero-card rounded-3xl p-5 sm:p-6 text-white relative overflow-hidden">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="flex items-center gap-2 text-emerald-100/90 text-xs sm:text-sm font-semibold">
+                                        <span>Total Balance</span>
+                                        <button onclick="toggleBalanceHidden()" title="Hide / Show Balance" class="p-1 rounded-lg hover:bg-white/10 transition">
+                                            <i id="balance-eye-icon" data-lucide="eye" class="w-4 h-4 text-emerald-100"></i>
+                                        </button>
+                                    </div>
+                                    <select id="balance-period-select" onchange="renderDashboardMetrics()" class="px-3 py-1.5 rounded-full bg-black/25 border border-white/20 text-xs font-semibold text-white focus:outline-none cursor-pointer">
+                                        <option value="month" class="bg-slate-900">This Month</option>
+                                        <option value="week" class="bg-slate-900">This Week</option>
+                                        <option value="all" class="bg-slate-900">All Time</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-12 items-end gap-4 mt-2">
+                                    <div class="sm:col-span-7">
+                                        <div id="hero-total-balance" class="text-3xl sm:text-4xl font-black font-mono tracking-tight">
+                                            ৳ 48,750.50
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-2 mt-2 text-xs">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-950/50 text-emerald-200 font-bold">
+                                                ↑ +12.5%
+                                            </span>
+                                            <span class="text-emerald-100/85">from last month</span>
+                                            <span id="hero-secondary-balance" class="text-emerald-200/80 font-mono ml-1"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Emerald Sparkline Curve with Nodes -->
+                                    <div class="sm:col-span-5 h-20">
+                                        <svg viewBox="0 0 220 75" class="w-full h-full overflow-visible">
+                                            <defs>
+                                                <linearGradient id="balanceSparkFill" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stop-color="#a7f3d0" stop-opacity="0.38" />
+                                                    <stop offset="100%" stop-color="#a7f3d0" stop-opacity="0.0" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path d="M 8 56 Q 48 52, 75 40 T 142 30 T 212 12 L 212 72 L 8 72 Z" fill="url(#balanceSparkFill)" />
+                                            <path d="M 8 56 Q 48 52, 75 40 T 142 30 T 212 12" fill="none" stroke="#a7f3d0" stroke-width="2.5" stroke-linecap="round" />
+                                            <circle cx="75" cy="40" r="4" fill="#ecfdf5" stroke="#059669" stroke-width="2" />
+                                            <circle cx="142" cy="30" r="4" fill="#ecfdf5" stroke="#059669" stroke-width="2" />
+                                            <circle cx="182" cy="20" r="4" fill="#ecfdf5" stroke="#059669" stroke-width="2" />
+                                            <circle cx="212" cy="12" r="4.5" fill="#ffffff" stroke="#059669" stroke-width="2" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. QUICK ACTIONS STRIP -->
+                            <div class="vs-card rounded-3xl p-4">
+                                <div class="grid grid-cols-5 gap-2 sm:gap-4 text-center">
+                                    <button onclick="openSendMoneyModal()" class="group flex flex-col items-center gap-2 p-2 rounded-2xl hover:bg-emerald-500/10 transition">
+                                        <div class="w-11 h-11 rounded-full bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                                            <i data-lucide="send" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-[11px] sm:text-xs font-semibold">Send Money</span>
+                                    </button>
+
+                                    <button onclick="openAddMoneyModal()" class="group flex flex-col items-center gap-2 p-2 rounded-2xl hover:bg-emerald-500/10 transition">
+                                        <div class="w-11 h-11 rounded-full bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                                            <i data-lucide="plus" class="w-5 h-5"></i>
+                                        </div>
+                                        <span class="text-[11px] sm:text-xs font-semibold">Add Money</span>
+                                    </button>
+
+                                    <button onclick="openModal('qr-modal')" class="group flex flex-col items-center gap-2 p-2 rounded-2xl hover:bg-emerald-500/10 transition">
+                                        <div class="w-11 h-11 rounded-full bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                                            <i data-lucide="scan-line" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-[11px] sm:text-xs font-semibold">Scan QR</span>
+                                    </button>
+
+                                    <button onclick="openPayBillsModal()" class="group flex flex-col items-center gap-2 p-2 rounded-2xl hover:bg-emerald-500/10 transition">
+                                        <div class="w-11 h-11 rounded-full bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                                            <i data-lucide="zap" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-[11px] sm:text-xs font-semibold">Pay Bills</span>
+                                    </button>
+
+                                    <button onclick="openModal('more-hisab-modal')" class="group flex flex-col items-center gap-2 p-2 rounded-2xl hover:bg-emerald-500/10 transition">
+                                        <div class="w-11 h-11 rounded-full bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition">
+                                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-[11px] sm:text-xs font-semibold">More</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 3. MY WALLETS 5-CARD COLOR GRID -->
+                            <div class="vs-card rounded-3xl p-4 sm:p-5 space-y-3.5">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-sm sm:text-base font-bold">My Wallets</h2>
+                                    <button onclick="switchView('wallets')" class="text-xs font-semibold text-emerald-400 hover:underline flex items-center gap-1">
+                                        View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <div id="dashboard-wallets-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+
+                            <!-- 4. SPENDING OVERVIEW DONUT + YOUR GOALS CARD -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                                <!-- Spending Overview Donut Card (6 cols) -->
+                                <div class="md:col-span-6 vs-card rounded-3xl p-5 flex flex-col justify-between space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <h2 class="text-sm sm:text-base font-bold">Spending Overview</h2>
+                                        <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-semibold vs-muted">This Month</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-4 my-auto">
+                                        <!-- SVG Donut Chart -->
+                                        <div class="relative w-32 h-32 shrink-0 flex items-center justify-center">
+                                            <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
+                                                <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(148,163,184,0.14)" stroke-width="14" />
+                                                <!-- Food & Dining: 38% (circumference ~276.46 -> 105.05) -->
+                                                <circle cx="60" cy="60" r="44" fill="none" stroke="#f59e0b" stroke-width="14" stroke-dasharray="105.05 276.46" stroke-dashoffset="0" />
+                                                <!-- Shopping: 32% (88.47) -->
+                                                <circle cx="60" cy="60" r="44" fill="none" stroke="#10b981" stroke-width="14" stroke-dasharray="88.47 276.46" stroke-dashoffset="-105.05" />
+                                                <!-- Bills: 20% (55.29) -->
+                                                <circle cx="60" cy="60" r="44" fill="none" stroke="#3b82f6" stroke-width="14" stroke-dasharray="55.29 276.46" stroke-dashoffset="-193.52" />
+                                                <!-- Others: 10% (27.65) -->
+                                                <circle cx="60" cy="60" r="44" fill="none" stroke="#8b5cf6" stroke-width="14" stroke-dasharray="27.65 276.46" stroke-dashoffset="-248.81" />
+                                            </svg>
+                                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                                                <span id="donut-total-spent" class="text-xs sm:text-sm font-black font-mono">৳ 28,750</span>
+                                                <span class="text-[9px] vs-muted font-medium">Total Spent</span>
+                                            </div>
+  </div>
+     <!-- Legend List -->
+                                        <div class="flex-1 space-y-2 text-xs">
+                                            <div class="flex items-center justify-between">
+                                                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>Food &amp; Dining</span>
+                                                <span class="font-mono font-bold">38%</span>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Shopping</span>
+                                                <span class="font-mono font-bold">32%</span>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>Bills</span>
+                                                <span class="font-mono font-bold">20%</span>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>Others</span>
+                                                <span class="font-mono font-bold">10%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Your Goals Card (6 cols) -->
+                                <div class="md:col-span-6 vs-card rounded-3xl p-5 flex flex-col justify-between space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <h2 class="text-sm sm:text-base font-bold">Your Goals</h2>
+                                        <button onclick="switchView('goals')" class="text-xs font-semibold text-emerald-400 hover:underline flex items-center gap-1">
+                                            View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                        </button>
+                                    </div>
+
+                                    <div id="featured-goal-box" class="p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-2.5">
+                                        <!-- Populated via JS (Defaults to Buy iPhone 17 — 65%, ৳ 65,000 / ৳ 1,00,000) -->
+                                    </div>
+
+                                    <button onclick="openModal('add-goal-modal')" class="w-full py-2.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                                        Add New Goal <i data-lucide="plus" class="w-4 h-4 text-emerald-400"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT COLUMN (4 cols): Recent Activity + VaultSpace Premium -->
+                        <div class="xl:col-span-4 space-y-5">
+
+                            <!-- RECENT ACTIVITY FEED -->
+                            <div class="vs-card rounded-3xl p-5 space-y-3.5">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-sm sm:text-base font-bold">Recent Activity</h2>
+                                    <button onclick="switchView('transactions')" class="text-xs font-semibold text-emerald-400 hover:underline flex items-center gap-1">
+                                        View All <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+
+                                <div id="recent-activity-feed" class="space-y-2.5">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+
+                            <!-- VAULTSPACE PREMIUM CARD -->
+                            <div class="premium-card-bg rounded-3xl p-5 text-white relative overflow-hidden space-y-4">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <div class="inline-flex items-center gap-1 text-amber-300 text-xs font-bold">
+                                            <i data-lucide="crown" class="w-4 h-4 fill-amber-300/30"></i>
+                                        </div>
+                                        <h3 class="text-xl font-black leading-tight mt-0.5">
+                                            VaultSpace<br />
+                                            <span class="text-emerald-400">Premium</span>
+                                        </h3>
+                                    </div>
+                                    <!-- Glowing 3D Faceted Emerald Diamond Graphic -->
+                                    <svg viewBox="0 0 88 76" class="w-20 h-16 shrink-0 drop-shadow-[0_0_16px_rgba(52,211,153,0.55)]">
+                                        <defs>
+                                            <linearGradient id="diaTop" x1="0" y1="0" x2="1" y2="1">
+                                                <stop offset="0%" stop-color="#a7f3d0" />
+                                                <stop offset="100%" stop-color="#10b981" />
+                                            </linearGradient>
+                                            <linearGradient id="diaBottom" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stop-color="#059669" />
+                                                <stop offset="100%" stop-color="#064e3b" />
+                                            </linearGradient>
+                                        </defs>
+                                        <polygon points="24,10 64,10 80,30 44,68 8,30" fill="url(#diaBottom)" stroke="#6ee7b7" stroke-width="1.5" />
+                                        <polygon points="24,10 64,10 80,30 8,30" fill="url(#diaTop)" opacity="0.85" />
+                                        <polyline points="24,10 34,30 44,68 54,30 64,10" fill="none" stroke="#d1fae5" stroke-width="1" opacity="0.7" />
+                                        <line x1="8" y1="30" x2="80" y2="30" stroke="#ecfdf5" stroke-width="1.2" opacity="0.75" />
+                                    </svg>
+                                </div>
+
+                                <ul class="space-y-2 text-xs text-emerald-50/90">
+                                    <li class="flex items-center gap-2.5">
+                                        <span class="w-4 h-4 rounded-full bg-emerald-500/25 text-emerald-300 flex items-center justify-center shrink-0">
+                                            <i data-lucide="check" class="w-3 h-3"></i>
+                                        </span>
+                                        <span>Unlimited Wallets</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5">
+                                        <span class="w-4 h-4 rounded-full bg-emerald-500/25 text-emerald-300 flex items-center justify-center shrink-0">
+                                            <i data-lucide="check" class="w-3 h-3"></i>
+                                        </span>
+                                        <span>Zero Transaction Fee</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5">
+                                        <span class="w-4 h-4 rounded-full bg-emerald-500/25 text-emerald-300 flex items-center justify-center shrink-0">
+                                            <i data-lucide="check" class="w-3 h-3"></i>
+                                        </span>
+                                        <span>Advanced Analytics</span>
+                                    </li>
+                                    <li class="flex items-center gap-2.5">
+                                        <span class="w-4 h-4 rounded-full bg-emerald-500/25 text-emerald-300 flex items-center justify-center shrink-0">
+                                            <i data-lucide="check" class="w-3 h-3"></i>
+                                        </span>
+                                        <span>Priority Support</span>
+                                    </li>
+                                </ul>
+
+                                <button onclick="openModal('premium-modal')" class="w-full py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 hover:brightness-105 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/50 transition">
+                                    Upgrade Now <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- FULL-WIDTH REFER & EARN BANNER -->
+                    <div class="refer-banner-bg rounded-3xl p-4 sm:p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                        <div class="flex items-center gap-4">
+                            <!-- Gift Boxes Illustration -->
+                            <div class="w-16 h-14 rounded-2xl bg-black/25 border border-emerald-300/25 flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 64 48" class="w-12 h-10">
+                                    <rect x="8" y="18" width="20" height="22" rx="3" fill="#f59e0b" />
+                                    <rect x="6" y="13" width="24" height="6" rx="2" fill="#fbbf24" />
+                                    <rect x="16" y="13" width="4" height="27" fill="#dc2626" />
+                                    <rect x="34" y="14" width="22" height="26" rx="3" fill="#10b981" />
+                                    <rect x="32" y="9" width="26" height="6" rx="2" fill="#34d399" />
+                                    <rect x="43" y="9" width="4" height="31" fill="#f59e0b" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-base sm:text-lg font-extrabold tracking-tight">Refer &amp; Earn</h3>
+                                <p class="text-xs sm:text-sm text-emerald-100/90">
+                                    Invite your friends and get <span id="refer-bonus-label" class="font-extrabold text-amber-300">৳100</span> bonus!
+                                </p>
+                            </div>
+                        </div>
+
+                        <button onclick="openModal('refer-modal')" class="px-5 py-2.5 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition shrink-0">
+                            <span>Share Now</span>
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                </section>
+                  <!-- ========================================================= -->
+                <!-- VIEW B: WALLETS, TRANSACTIONS, CARDS, GOALS, STATEMENT... -->
+                <!-- ========================================================= -->
+                <section id="view-subpage" class="hidden space-y-5">
+                    <div class="flex flex-wrap items-center justify-between gap-3 vs-card rounded-2xl p-4 no-print">
+                        <div class="flex items-center gap-3">
+                            <button onclick="switchView('dashboard')" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition">
+                                <i data-lucide="arrow-left" class="w-4 h-4"></i> Dashboard
+                            </button>
+                            <div>
+                                <h2 id="subpage-heading" class="text-base sm:text-lg font-extrabold">Section</h2>
+                                <p id="subpage-subtitle" class="text-xs vs-muted">Manage your banking &amp; Hisab records</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openMoreHisabModal('income')" class="px-3 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs flex items-center gap-1 transition">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Hisab
+                            </button>
+                            <button onclick="switchView('statement')" class="px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center gap-1 transition">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i> E-Statement
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="subpage-dynamic-content" class="space-y-5"></div>
+                </section>
+
+                <!-- ========================================================= -->
+                <!-- VIEW C: OFFICIAL PRINTABLE A4 E-STATEMENT VIEW            -->
+                <!-- ========================================================= -->
+                <section id="view-statement" class="hidden space-y-4">
+                    <div class="vs-card rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 no-print">
+                        <div class="flex items-center gap-3">
+                            <button onclick="switchView('dashboard')" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+                                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+                            </button>
+                            <div>
+                                <h2 class="text-sm sm:text-base font-bold">Official Central Treasury E-Statement</h2>
+                                <p class="text-xs vs-muted">Wet-ink official seal, audit verification &amp; print-ready layout</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/25 border border-emerald-500/20 text-xs">
+                                <span class="vs-muted mr-1">Seal Ink:</span>
+                                <button onclick="setOfficialSealInk('blue')" title="Royal Bank Blue" class="w-4 h-4 rounded-full bg-blue-700 ring-2 ring-white"></button>
+                                <button onclick="setOfficialSealInk('emerald')" title="Treasury Emerald" class="w-4 h-4 rounded-full bg-emerald-700"></button>
+                                <button onclick="setOfficialSealInk('crimson')" title="Sovereign Crimson" class="w-4 h-4 rounded-full bg-red-700"></button>
+                            </div>
+                            <button onclick="toggleOfficialSealAngle()" class="px-3 py-2 rounded-xl vs-card text-xs font-semibold flex items-center gap-1.5">
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-emerald-400"></i>
+                                <span id="seal-angle-btn-label">Stamped (-7°)</span>
+                            </button>
+                            <button onclick="exportLedgerCSV()" class="px-3 py-2 rounded-xl vs-card text-xs font-semibold flex items-center gap-1.5">
+                                <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-400"></i> CSV
+                            </button>
+                            <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 shadow-md">
+                                <i data-lucide="printer" class="w-4 h-4"></i> Print / PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Printable Official Statement Sheet -->
+                    <div id="printable-statement-sheet" class="bg-white text-slate-900 rounded-3xl p-6 sm:p-10 max-w-4xl mx-auto shadow-2xl border border-slate-200 relative overflow-hidden">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between border-b-2 border-slate-900 pb-5 gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center shrink-0">
+                                    <span id="stmt-logo-emblem"></span>
+                                </div>
+                                <div>
+                                    <div class="text-xl font-black tracking-tight text-slate-900">Vault<span class="text-emerald-600">Space</span> <span class="text-[10px] font-mono uppercase bg-slate-900 text-white px-2 py-0.5 rounded ml-1">OFFICIAL STATEMENT</span></div>
+                                    <div class="text-xs text-slate-600 font-medium">Central Treasury, Hisab Ledger &amp; Digital Clearing</div>
+                                </div>
+                            </div>
+                            <div class="sm:text-right text-xs font-mono space-y-0.5">
+                                <div class="font-bold text-slate-900">DOC #: <span id="stmt-doc-serial" class="text-blue-800">VS-2026-8849</span></div>
+                                <div class="text-slate-600">ISSUED: <span id="stmt-issue-date"></span></div>
+                                <div class="text-slate-600">CURRENCY: BDT (৳) / SAR (﷼)</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-5 border-b border-slate-200 text-xs">
+                            <div>
+                                <div class="text-[10px] font-bold uppercase text-slate-400">Account Holder</div>
+                                <div id="stmt-p-name" class="text-sm font-extrabold text-slate-900 mt-0.5">Emtiyaz T</div>
+                                <div class="text-slate-600 font-mono mt-0.5">Handle: <span id="stmt-p-handle">@emtiyaz.vault</span></div>
+                                <div class="text-slate-600 font-mono">Phone: <span id="stmt-p-phone">+880 1711-849210</span></div>
+                            </div>
+                            <div class="sm:text-right space-y-0.5 font-mono">
+                                <div class="text-[10px] font-sans font-bold uppercase text-slate-400">Account Summary</div>
+                                <div class="text-slate-800 font-bold">A/C: <span id="stmt-p-ac">VS-8801-9420-7712</span></div>
+                                <div class="text-slate-600">Nominee: <span id="stmt-p-nominee">Nusrat Jahan</span></div>
+                                <div class="text-slate-900 font-extrabold pt-1">BALANCE: <span id="stmt-p-bal">৳ 48,750.50</span></div>
+                            </div>
+                        </div>
+
+                        <div class="py-5 overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b border-slate-300 text-[10px] font-bold uppercase text-slate-600">
+                                        <th class="py-2 px-2.5">Date</th>
+                                        <th class="py-2 px-2.5">Ref</th>
+                                        <th class="py-2 px-2.5">Description</th>
+                                        <th class="py-2 px-2.5">Wallet</th>
+                                        <th class="py-2 px-2.5 text-right">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stmt-rows-body" class="divide-y divide-slate-200 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Official Seal + Authorized Signature Footer -->
+                        <div class="pt-5 border-t-2 border-slate-900 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
+                            <div class="flex items-center gap-3">
+                                <div id="stmt-qr-box" class="w-16 h-16 p-1 border-2 border-slate-900 rounded-lg bg-white shrink-0"></div>
+                                <div class="text-[10px] text-slate-600 space-y-0.5">
+                                    <div class="font-bold text-slate-900 uppercase">Verified Official Treasury Record</div>
+                                    <div>Authenticity Hash: <span id="stmt-hash-code" class="font-mono font-bold text-slate-800">8F92A4C1E0</span></div>
+                                    <div>Save • Manage • Grow — VaultSpace</div>
+                                </div>
+                            </div>
+
+                            <div class="relative flex items-end justify-end self-end pr-2">
+                                <div id="stmt-official-seal-host" class="seal-ink-blue -mr-9 -mb-1 z-20 pointer-events-none" style="transform: rotate(-7deg);"></div>
+                                <div class="text-center relative z-10 min-w-[180px]">
+                                    <div class="font-script text-2xl text-slate-900 -mb-1">Emtiyaz T</div>
+                                    <div class="border-t-2 border-slate-900 pt-1">
+                                        <div class="text-[10px] font-extrabold uppercase text-slate-900">Authorized Signatory (©emti)</div>
+                                        <div class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Central Treasury Officer</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+          <!-- BOTTOM FOOTER BAR -->
+            <footer class="px-6 py-4 border-t border-emerald-500/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs vs-muted no-print">
+                <div class="flex items-center gap-1.5 font-medium">
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400"></i>
+                    <span>Your Money. Our Priority.</span>
+                    <span class="mx-1">•</span>
+                    <span class="font-mono text-emerald-400/90">©emti</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="openModal('refer-modal')" title="Share" class="hover:text-emerald-400 transition">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="openModal('brand-logo-modal')" title="Brand & Media" class="hover:text-emerald-400 transition">
+                        <i data-lucide="youtube" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="openModal('profile-modal')" title="Global Currency & Region" class="hover:text-emerald-400 transition">
+                        <i data-lucide="globe" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODALS COLLECTION (Zero alert() / confirm() anywhere)      -->
+    <!-- ========================================================= -->
+
+    <!-- 1. Brand Logo & Identity Showcase Modal -->
+    <div id="brand-logo-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="vs-card rounded-3xl max-w-md w-full p-6 text-center space-y-4">
+            <div class="flex justify-end">
+                <button onclick="closeModal('brand-logo-modal')" class="p-1.5 rounded-lg hover:bg-white/10 vs-muted">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="w-28 h-28 mx-auto rounded-3xl bg-[#050d0a] border border-emerald-400/35 flex items-center justify-center shadow-2xl shadow-emerald-950">
+                <span id="modal-emblem-slot"></span>
+            </div>
+            <div>
+                <div class="text-3xl font-black tracking-tight">Vault<span class="text-emerald-400">Space</span><span class="text-xs align-top ml-0.5 text-emerald-300">TM</span></div>
+                <div class="text-xs font-bold tracking-widest uppercase text-emerald-400 mt-1">SAVE • MANAGE • GROW</div>
+                <div class="font-script text-2xl text-emerald-200 mt-2">Your Money, Your Space</div>
+            </div>
+            <p class="text-xs vs-muted leading-relaxed">
+                Designed for smart personal banking, multi-wallet Hisab bookkeeping, Baki tracking, and verified statements.
+            </p>
+            <button onclick="closeModal('brand-logo-modal')" class="w-full py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Send Money / Add Money / Pay Bills Modal -->
+    <div id="action-tx-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="vs-card rounded-3xl max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="action-tx-title" class="text-base font-extrabold">Send Money</h3>
+                <button onclick="closeModal('action-tx-modal')" class="p-1.5 rounded-lg hover:bg-white/10 vs-muted">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form onsubmit="submitActionTransaction(event)" class="space-y-3.5">
+                <input type="hidden" id="action-tx-type" value="expense" />
+                <div>
+                    <label class="block text-[11px] font-bold uppercase vs-muted mb-1">Select Wallet</label>
+                    <select id="action-tx-wallet" class="w-full px-3.5 py-2.5 rounded-xl bg-black/30 border border-emerald-500/25 text-xs font-semibold">
+                        <option value="Personal">Personal Wallet</option>
+                        <option value="Savings">Savings Wallet</option>
+                        <option value="Goals">Goals Wallet</option>
+                        <option value="Dream Fund">Dream Fund</option>
+                        <option value="Travel">Travel Wallet</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase vs-muted mb-1">Recipient / Bill / Source Note</label>
+                    <input id="action-tx-note" type="text" required placeholder="e.g. Sent to Rafiq, Electricity Bill, Deposit..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/30 border border-emerald-500/25 text-xs" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase vs-muted mb-1">Amount (BDT ৳)</label>
+                        <input id="action-tx-amount" type="number" required min="1" step="any" placeholder="1500" class="w-full px-3.5 py-2.5 rounded-xl bg-black/30 border border-emerald-500/25 text-sm font-mono font-bold" />
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase vs-muted mb-1">Category</label>
+                        <select id="action-tx-category" class="w-full px-3.5 py-2.5 rounded-xl bg-black/30 border border-emerald-500/25 text-xs font-semibold">
+                            <option value="Food & Dining">Food &amp; Dining</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Bills">Bills</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('action-tx-modal')" class="px-4 py-2 rounded-xl bg-white/5 text-xs font-semibold">Cancel</button>
+                    <button type="submit" id="action-tx-submit-btn" class="px-5 py-2 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. More / Hisab Saver (Cash In, Cash Out, Baki Pabo/Dibo, E-Statement) Modal -->
+    <div id="more-hisab-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="vs-card rounded-3xl max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-extrabold">Hisab Saver &amp; Quick Tools</h3>
+                    <p class="text-[11px] vs-muted">Record Cash In/Out, Baki Due, or open E-Statement</p>
+                </div>
+                <button onclick="closeModal('more-hisab-modal')" class="p-1.5 rounded-lg hover:bg-white/10 vs-muted">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <form onsubmit="submitHisabEntry(event)" class="space-y-3">
+                <div class="grid grid-cols-4 gap-1.5 text-[11px] font-bold">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hisabKind" value="income" class="peer sr-only" checked />
+                        <div class="py-2 rounded-xl border border-emerald-500/25 text-center peer-checked:bg-emerald-500 peer-checked:text-slate-950">+ Cash In</div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hisabKind" value="expense" class="peer sr-only" />
+                        <div class="py-2 rounded-xl border border-emerald-500/25 text-center peer-checked:bg-rose-500 peer-checked:text-white">- Cash Out</div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hisabKind" value="baki_pabo" class="peer sr-only" />
+                        <div class="py-2 rounded-xl border border-emerald-500/25 text-center peer-checked:bg-amber-400 peer-checked:text-slate-950">Pabo</div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hisabKind" value="baki_dibo" class="peer sr-only" />
+                        <div class="py-2 rounded-xl border border-emerald-500/25 text-center peer-checked:bg-orange-500 peer-checked:text-white">Dibo</div>
+                    </label>
+                </div>
+                <input id="hisab-note-input" type="text" required placeholder="Hisab note or person name..." class="w-full px-3.5 py-2 rounded-xl bg-black/30 border border-emerald-500/25 text-xs" />
+                <div class="grid grid-cols-2 gap-2.5">
+                    <input id="hisab-amount-input" type="number" required min="1" step="any" placeholder="Amount (৳)" class="w-full px-3.5 py-2 rounded-xl bg-black/30 border border-emerald-500/25 text-xs font-mono font-bold" />
+                    <select id="hisab-cat-input" class="w-full px-3 py-2 rounded-xl bg-black/30 border border-emerald-500/25 text-xs font-semibold">
+                        <option value="Food & Dining">Food &amp; Dining</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Bills">Bills</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between pt-2">
+                    <button type="button" onclick="closeModal('more-hisab-modal'); switchView('statement');" class="px-3 py-2 rounded-xl bg-blue-500/15 text-blue-300 border border-blue-500/30 text-xs font-bold">
+                        Open E-Statement
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                        Save Hisab
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+  <!-- 9. Digital Receipt Modal -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="max-w-sm w-full space-y-2.5">
+            <div class="bg-white text-slate-900 rounded-3xl p-5 space-y-4 shadow-2xl">
+                <div class="text-center border-b border-dashed border-slate-300 pb-3.5">
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">VaultSpace Digital Receipt</div>
+                    <div id="rcpt-amount-val" class="text-2xl font-black font-mono text-slate-900 mt-1">৳ 2,000</div>
+                    <div id="rcpt-title-val" class="text-xs font-semibold text-slate-600 mt-0.5">Received Money</div>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between"><span class="text-slate-500">Ref ID</span><span id="rcpt-id-val" class="font-mono font-bold">#VS-101</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Time</span><span id="rcpt-time-val" class="font-mono">Today, 2:45 PM</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Wallet</span><span id="rcpt-wallet-val" class="font-semibold">Personal</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Category</span><span id="rcpt-cat-val" class="font-semibold">Others</span></div>
+                </div>
+                <div class="pt-3 border-t border-dashed border-slate-300 flex items-center justify-between gap-2">
+                    <div class="text-[10px] text-slate-500">
+                        <div class="font-bold text-slate-800">Official Clearing</div>
+                        <div>Signatory: ©emti</div>
+                    </div>
+                    <div id="rcpt-seal-host" class="seal-ink-blue shrink-0" style="transform: rotate(-7deg);"></div>
+                </div>
+            </div>
+            <button onclick="closeModal('receipt-modal')" class="w-full py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                Close Receipt
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- JAVASCRIPT APPLICATION & 3D SHIELD-WALLET EMBLEM ENGINE   -->
+    <!-- ========================================================= -->
+    <script>
+        const SAR_RATE = 32.15;
+        const STATE_STORAGE_KEY = 'vaultspace_emerald_hisab_v1';
+
+        const INITIAL_STATE = {
+            profile: {
+                name: 'Emtiyaz T',
+                handle: '@emtiyaz.vault',
+                phone: '+880 1711-849210',
+                acNumber: 'VS-8801-9420-7712',
+                nominee: 'Nusrat Jahan',
+                role: 'Premium Member'
+            },
+            preferences: {
+                darkMode: true,
+                balanceHidden: false,
+                currency: 'BDT', // 'BDT' or 'SAR'
+                sealInk: 'blue',
+                sealAngled: true,
+                cardTheme: 'emerald'
+            },
+            wallets: [
+                { id: 'w-personal', name: 'Personal', balance: 12500, delta: '+8%', grad: 'from-emerald-400 to-emerald-600', icon: 'wallet' },
+                { id: 'w-savings', name: 'Savings', balance: 15200, delta: '+12%', grad: 'from-sky-400 to-blue-600', icon: 'piggy-bank' },
+                { id: 'w-goals', name: 'Goals', balance: 8750, delta: '+5%', grad: 'from-amber-300 to-amber-500', icon: 'target' },
+                { id: 'w-dream', name: 'Dream Fund', balance: 7300, delta: '+10%', grad: 'from-violet-400 to-purple-600', icon: 'gift' },
+                { id: 'w-travel', name: 'Travel', balance: 4000, delta: '+6%', grad: 'from-rose-400 to-rose-600', icon: 'plane' }
+            ],
+            goals: [
+                { id: 'g-1', title: 'Buy iPhone 17', saved: 65000, target: 100000 }
+            ],
+            spendingBreakdown: {
+                totalSpent: 28750,
+                foodPct: 38,
+                shoppingPct: 32,
+                billsPct: 20,
+                othersPct: 10
+            },
+            activities: [
+                { id: 'VS-201', title: 'Received Money', time: 'Today, 2:45 PM', date: '2026-11-24', wallet: 'Personal', category: 'Others', type: 'in', amount: 2000, icon: 'wallet', badgeBg: 'bg-emerald-500/15 text-emerald-400' },
+                { id: 'VS-202', title: 'Sent Money', time: 'Today, 1:20 PM', date: '2026-11-24', wallet: 'Personal', category: 'Others', type: 'out', amount: 1500, icon: 'send', badgeBg: 'bg-rose-500/15 text-rose-400' },
+                { id: 'VS-203', title: 'Bill Payment', time: 'Yesterday, 9:30 PM', date: '2026-11-23', wallet: 'Personal', category: 'Bills', type: 'out', amount: 599, icon: 'zap', badgeBg: 'bg-sky-500/15 text-sky-400' },
+                { id: 'VS-204', title: 'Mobile Recharge', time: 'Yesterday, 7:15 PM', date: '2026-11-23', wallet: 'Personal', category: 'Others', type: 'out', amount: 199, icon: 'smartphone', badgeBg: 'bg-emerald-500/15 text-emerald-400' }
+            ]
+        };
+
+        let state = loadSavedState();
+        let currentView = 'dashboard';
+
+        function loadSavedState() {
+            try {
+                const raw = localStorage.getItem(STATE_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    return {
+                        ...INITIAL_STATE,
+                        ...parsed,
+                        profile: { ...INITIAL_STATE.profile, ...(parsed.profile || {}) },
+                        preferences: { ...INITIAL_STATE.preferences, ...(parsed.preferences || {}) },
+                        spendingBreakdown: { ...INITIAL_STATE.spendingBreakdown, ...(parsed.spendingBreakdown || {}) }
+                    };
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            return JSON.parse(JSON.stringify(INITIAL_STATE));
+        }
+
+        function persistState() {
+            try {
+                localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function notify(msg, tone = 'emerald') {
+            const box = document.getElementById('toast-box');
+            const el = document.createElement('div');
+            const styles = tone === 'rose'
+                ? 'bg-rose-950/95 border-rose-500/40 text-rose-200'
+                : 'bg-[#081c14]/95 border-emerald-400/40 text-emerald-200';
+            el.className = `pointer-events-auto px-4 py-2.5 rounded-2xl border text-xs font-bold shadow-xl backdrop-blur-md transition-all duration-300 ${styles}`;
+            el.textContent = msg;
+            box.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 250);
+            }, 2600);
+        }
+
+        // --- High-Detail 3D Glowing Shield-Wallet Emblem SVG ---
+        function buildVaultSpace3DEmblem(uid, size = 48) {
+            return `
+                <svg width="${size}" height="${size}" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="block select-none">
+                    <defs>
+                        <radialGradient id="glowAura-${uid}" cx="50%" cy="55%" r="50%">
+                            <stop offset="0%" stop-color="#34d399" stop-opacity="0.45" />
+                            <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+                        </radialGradient>
+                        <linearGradient id="cardBack-${uid}" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#6ee7b7" />
+                            <stop offset="100%" stop-color="#059669" />
+                        </linearGradient>
+                        <linearGradient id="walletBody-${uid}" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#16222c" />
+                            <stop offset="65%" stop-color="#0b1218" />
+                            <stop offset="100%" stop-color="#06281e" />
+                        </linearGradient>
+                        <linearGradient id="shieldFace-${uid}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#6ee7b7" />
+                            <stop offset="55%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#047857" />
+                        </linearGradient>
+                        <linearGradient id="swooshGrad-${uid}" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#10b981" />
+                            <stop offset="50%" stop-color="#a7f3d0" />
+                            <stop offset="100%" stop-color="#34d399" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Emerald Glow Aura -->
+                    <circle cx="60" cy="64" r="52" fill="url(#glowAura-${uid})" />
+
+                    <!-- Floating Cards Peeking Behind Wallet -->
+                    <rect x="34" y="16" width="44" height="24" rx="5" transform="rotate(-11 34 16)" fill="url(#cardBack-${uid})" stroke="#a7f3d0" stroke-width="1.2" />
+                    <rect x="44" y="22" width="42" height="22" rx="5" transform="rotate(6 44 22)" fill="#34d399" stroke="#ecfdf5" stroke-width="1.1" />
+
+                    <!-- 3D Dark Wallet Body -->
+                    <rect x="20" y="34" width="76" height="58" rx="12" fill="url(#walletBody-${uid})" stroke="#34d399" stroke-width="1.6" />
+                    <!-- Stitch Accent -->
+                    <rect x="24" y="38" width="68" height="50" rx="9" fill="none" stroke="#6ee7b7" stroke-width="0.9" stroke-dasharray="3 3" opacity="0.55" />
+
+                    <!-- Glowing Emerald Shield with Lock -->
+                    <path d="M40 46 L68 46 L68 65 C68 78 54 85 54 85 C54 85 40 78 40 65 Z" fill="#062219" stroke="url(#shieldFace-${uid})" stroke-width="3" />
+                    <path d="M43 49 L65 49 L65 64 C65 74.5 54 80.5 54 80.5 C54 80.5 43 74.5 43 64 Z" fill="url(#shieldFace-${uid})" opacity="0.22" />
+                    <!-- Padlock Icon Inside Shield -->
+                    <path d="M49.5 62 V58.5 C49.5 55.8 51.5 54 54 54 C56.5 54 58.5 55.8 58.5 58.5 V62" fill="none" stroke="#f0fdf4" stroke-width="2.2" stroke-linecap="round" />
+                    <rect x="47.5" y="62" width="13" height="10.5" rx="2.2" fill="#f0fdf4" />
+                    <circle cx="54" cy="66.5" r="1.4" fill="#064e3b" />
+                    <rect x="53.2" y="67" width="1.6" height="3.2" rx="0.6" fill="#064e3b" />
+
+                    <!-- Right Clasp Tab & Metallic Rivet -->
+                    <path d="M78 52 H98 C100.5 52 102 53.5 102 56 V70 C102 72.5 100.5 74 98 74 H78 C75.5 74 74 72.5 74 70 V56 C74 53.5 75.5 52 78 52 Z" fill="#13222a" stroke="#6ee7b7" stroke-width="1.3" />
+                    <circle cx="84" cy="63" r="4.2" fill="#cbd5e1" stroke="#475569" stroke-width="1" />
+
+                    <!-- Orbiting Glowing Swoosh -->
+                    <path d="M14 78 C24 102, 88 104, 106 62 C113 46, 102 34, 88 33" fill="none" stroke="url(#swooshGrad-${uid})" stroke-width="3.6" stroke-linecap="round" />
+                </svg>
+            `;
+        }
+
+        // --- Official Guilloché Central Treasury Seal SVG ---
+        function buildOfficialSealSVG(uid, pxSize = 136) {
+            let teeth = '';
+            for (let i = 0; i < 64; i++) {
+                const deg = (i * 360) / 64;
+                teeth += `<line x1="100" y1="5" x2="100" y2="9" stroke="currentColor" stroke-width="1.6" transform="rotate(${deg} 100 100)"/>`;
+            }
+            let petals = '';
+            for (let i = 0; i < 20; i++) {
+                const deg = (i * 360) / 20;
+                petals += `<ellipse cx="100" cy="100" rx="42" ry="14" fill="none" stroke="currentColor" stroke-width="0.45" opacity="0.35" transform="rotate(${deg} 100 100)"/>`;
+            }
+            return `
+                <svg width="${pxSize}" height="${pxSize}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="block">
+                    <defs>
+                        <path id="sealTop-${uid}" d="M 25,100 A 75,75 0 1,1 175,100" />
+                        <path id="sealBot-${uid}" d="M 176,100 A 76,76 0 1,1 24,100" />
+                    </defs>
+                    <g opacity="0.85">${teeth}</g>
+                    <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width="2.5" />
+                    <circle cx="100" cy="100" r="63" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 3" />
+                    <g>${petals}</g>
+                    <text font-family="Inter, sans-serif" font-size="8.4" font-weight="800" letter-spacing="1.6" fill="currentColor">
+                        <textPath href="#sealTop-${uid}" startOffset="50%" text-anchor="middle">VAULTSPACE CENTRAL TREASURY</textPath>
+                    </text>
+                    <text font-family="Inter, sans-serif" font-size="8.2" font-weight="800" letter-spacing="1.5" fill="currentColor">
+                        <textPath href="#sealBot-${uid}" startOffset="50%" text-anchor="middle">OFFICIAL VERIFIED SEAL</textPath>
+                    </text>
+                    <path d="M86 58 H114 V74 C114 85 100 92 100 92 C100 92 86 85 86 74 Z" fill="rgba(255,255,255,0.88)" stroke="currentColor" stroke-width="1.6" />
+                    <polygon points="100,62 110,67.5 90,67.5" fill="currentColor" />
+                    <rect x="92" y="69" width="2.2" height="9" fill="currentColor" />
+                    <rect x="98.9" y="69" width="2.2" height="9" fill="currentColor" />
+                    <rect x="105.8" y="69" width="2.2" height="9" fill="currentColor" />
+                    <rect x="46" y="96" width="108" height="20" rx="3" fill="rgba(255,255,255,0.95)" stroke="currentColor" stroke-width="1.8" />
+                    <text x="100" y="109.5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" letter-spacing="2.2" fill="currentColor">OFFICIAL</text>
+                    <text x="100" y="131" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700" fill="currentColor">©EMTI • REG. VS-2026</text>
+                </svg>
+            `;
+        }
+      function renderQRMatrix(containerId, textSeed) {
+            const box = document.getElementById(containerId);
+            if (!box) return;
+            const n = 13;
+            let h = 9973;
+            for (let i = 0; i < textSeed.length; i++) h = (h * 31 + textSeed.charCodeAt(i)) >>> 0;
+            let cells = '';
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    const corner = (r < 3 && c < 3) || (r < 3 && c >= n - 3) || (r >= n - 3 && c < 3);
+                    const on = corner ? !((r === 1 || r === n - 2) && (c === 1 || c === n - 2)) : (((h >> ((r * n + c) % 24)) ^ (r * 5 + c * 9)) & 1) === 1;
+                    if (on) cells += `<rect x="${c}" y="${r}" width="1" height="1" fill="#0f172a"/>`;
+                }
+            }
+            box.innerHTML = `<svg viewBox="0 0 ${n} ${n}" class="w-full h-full" shape-rendering="crispEdges">${cells}</svg>`;
+        }
+
+        // --- Money & Balance Formatting ---
+        function getTotalBalance() {
+            return state.wallets.reduce((sum, w) => sum + (Number(w.balance) || 0), 0);
+        }
+
+        function fmtMoney(bdtVal, includeDecimals = false) {
+            if (state.preferences.balanceHidden) return '••••••';
+            const num = Number(bdtVal) || 0;
+            if (state.preferences.currency === 'SAR') {
+                return `﷼ ${(num / SAR_RATE).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            if (includeDecimals || num % 1 !== 0) {
+                return `৳ ${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            return `৳ ${num.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+        }
+
+        // --- Navigation & Views ---
+        const NAV_ITEMS = [
+            { id: 'dashboard', label: 'Dashboard', icon: 'home' },
+            { id: 'wallets', label: 'My Wallets', icon: 'wallet' },
+            { id: 'transactions', label: 'Transactions', icon: 'repeat' },
+            { id: 'bills', label: 'Bills & Recharge', icon: 'receipt-text' },
+            { id: 'send', label: 'Send Money', icon: 'arrow-left-right' },
+            { id: 'cards', label: 'Cards', icon: 'credit-card' },
+            { id: 'goals', label: 'Goals', icon: 'target' },
+            { id: 'analytics', label: 'Analytics', icon: 'bar-chart-2' },
+            { id: 'settings', label: 'Settings', icon: 'settings' },
+            { id: 'support', label: 'Help & Support', icon: 'help-circle' }
+        ];
+
+        function renderSidebarNav() {
+            const nav = document.getElementById('sidebar-nav-list');
+            nav.innerHTML = NAV_ITEMS.map(item => {
+                const isActive = currentView === item.id;
+                return `
+                    <button onclick="handleNavClick('${item.id}')" class="w-full px-3.5 py-2.5 rounded-xl flex items-center gap-3 transition ${isActive ? 'emerald-active-nav font-bold' : 'vs-muted hover:text-white hover:bg-emerald-500/10'}">
+                        <i data-lucide="${item.icon}" class="w-4 h-4 ${isActive ? 'text-white' : 'text-emerald-400/80'}"></i>
+                        <span>${item.label}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function handleNavClick(id) {
+            toggleMobileSidebar(false);
+            if (id === 'send') {
+                switchView('dashboard');
+                openSendMoneyModal();
+                return;
+            }
+            if (id === 'bills') {
+                switchView('dashboard');
+                openPayBillsModal();
+                return;
+            }
+            switchView(id);
+        }
+
+        function switchView(viewId) {
+            currentView = viewId;
+            renderSidebarNav();
+
+            const dashEl = document.getElementById('view-dashboard');
+            const subEl = document.getElementById('view-subpage');
+            const stmtEl = document.getElementById('view-statement');
+
+            dashEl.classList.add('hidden');
+            subEl.classList.add('hidden');
+            stmtEl.classList.add('hidden');
+
+            if (viewId === 'dashboard') {
+                dashEl.classList.remove('hidden');
+            } else if (viewId === 'statement') {
+                stmtEl.classList.remove('hidden');
+                renderOfficialStatementView();
+            } else {
+                subEl.classList.remove('hidden');
+                renderSubpage(viewId);
+            }
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar(open) {
+            const sb = document.getElementById('app-sidebar');
+            const bd = document.getElementById('mobile-sidebar-backdrop');
+            if (open) {
+                sb.classList.remove('-translate-x-full');
+                bd.classList.remove('hidden');
+            } else {
+                sb.classList.add('-translate-x-full');
+                bd.classList.add('hidden');
+            }
+        }
+
+        // --- Render Dashboard Components ---
+        function renderDashboardMetrics() {
+            const totalBal = getTotalBalance();
+            document.getElementById('hero-total-balance').textContent = fmtMoney(totalBal, true);
+            document.getElementById('hero-secondary-balance').textContent = state.preferences.balanceHidden
+                ? ''
+                : (state.preferences.currency === 'BDT'
+                    ? `≈ ${(totalBal / SAR_RATE).toFixed(2)} SAR`
+                    : `≈ ৳ ${totalBal.toLocaleString('en-IN')}`);
+
+            document.getElementById('donut-total-spent').textContent = fmtMoney(state.spendingBreakdown.totalSpent, false);
+            document.getElementById('refer-bonus-label').textContent = state.preferences.currency === 'SAR'
+                ? `﷼ ${(100 / SAR_RATE).toFixed(2)}`
+                : '৳100';
+
+            const eyeIcon = document.getElementById('balance-eye-icon');
+            if (eyeIcon) eyeIcon.setAttribute('data-lucide', state.preferences.balanceHidden ? 'eye-off' : 'eye');
+        }
+
+        function renderWalletsGrid() {
+            const grid = document.getElementById('dashboard-wallets-grid');
+            grid.innerHTML = state.wallets.map(w => `
+                <button onclick="openAddMoneyModal('${w.name}')" class="rounded-2xl p-3.5 text-left text-white bg-gradient-to-br ${w.grad} shadow-md hover:scale-[1.02] transition flex flex-col justify-between min-h-[118px] relative overflow-hidden">
+                    <div class="w-8 h-8 rounded-xl bg-black/20 flex items-center justify-center">
+                        <i data-lucide="${w.icon}" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <div class="mt-3">
+                        <div class="text-xs font-semibold text-white/95 truncate">${w.name}</div>
+                        <div class="text-sm font-black font-mono mt-0.5">${fmtMoney(w.balance)}</div>
+                        <div class="text-[10px] font-bold text-white/85 mt-0.5">${w.delta}</div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function renderFeaturedGoal() {
+            const box = document.getElementById('featured-goal-box');
+            const g = state.goals[0] || { title: 'Buy iPhone 17', saved: 65000, target: 100000 };
+            const pct = Math.min(100, Math.round((g.saved / g.target) * 100));
+            box.innerHTML = `
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-7 h-7 rounded-full bg-rose-500/15 text-rose-400 flex items-center justify-center shrink-0">
+                            <i data-lucide="target" class="w-4 h-4"></i>
+                        </span>
+                        <span class="text-xs sm:text-sm font-bold truncate">${g.title}</span>
+                    </div>
+                    <span class="text-xs font-extrabold text-emerald-400 font-mono">${pct}%</span>
+                </div>
+                <div class="w-full h-2.5 rounded-full bg-black/30 overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 transition-all duration-500" style="width:${pct}%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] font-mono vs-muted">
+                    <span>${fmtMoney(g.saved)} / ${fmtMoney(g.target)}</span>
+                    <button onclick="boostFirstGoal(5000)" class="text-emerald-400 font-sans font-bold hover:underline">+ ৳5k</button>
+                </div>
+            `;
+        }
+
+        function renderRecentActivity() {
+            const feed = document.getElementById('recent-activity-feed');
+            feed.innerHTML = state.activities.slice(0, 4).map(act => {
+                const isCredit = act.type === 'in';
+                const sign = isCredit ? '+' : '-';
+                const amtColor = isCredit ? 'text-emerald-400' : 'text-rose-400';
+                return `
+                    <div onclick="openReceipt('${act.id}')" class="p-2.5 rounded-2xl hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 cursor-pointer flex items-center justify-between gap-3 transition">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-full ${act.badgeBg} flex items-center justify-center shrink-0">
+                                <i data-lucide="${act.icon}" class="w-4 h-4"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs sm:text-sm font-bold truncate">${act.title}</div>
+                                <div class="text-[11px] vs-muted truncate">${act.time}</div>
+                            </div>
+                        </div>
+                        <div class="text-xs sm:text-sm font-mono font-extrabold ${amtColor} shrink-0">
+                            ${sign}${fmtMoney(act.amount)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderProfileIdentity() {
+            const initials = state.profile.name.split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase() || 'ET';
+            document.getElementById('sidebar-user-avatar').textContent = initials;
+            document.getElementById('sidebar-user-name').textContent = `Hi, ${state.profile.name}`;
+            document.getElementById('hero-greeting-title').innerHTML = `Hi, ${state.profile.name} <span class="text-2xl">👋</span>`;
+            document.getElementById('premium-user-badge').textContent = `Hi, ${state.profile.name}`;
+            document.getElementById('top-currency-label').textContent = state.preferences.currency === 'BDT' ? 'BDT ৳' : 'SAR ﷼';
+      }
+      function renderEmblemsAndSeals() {
+            document.getElementById('sidebar-emblem-slot').innerHTML = buildVaultSpace3DEmblem('sb', 42);
+            document.getElementById('hero-emblem-slot').innerHTML = buildVaultSpace3DEmblem('hr', 64);
+            document.getElementById('modal-emblem-slot').innerHTML = buildVaultSpace3DEmblem('md', 92);
+            document.getElementById('stmt-logo-emblem').innerHTML = buildVaultSpace3DEmblem('st', 38);
+
+            const inkClass = `seal-ink-${state.preferences.sealInk || 'blue'}`;
+            const rot = state.preferences.sealAngled !== false ? 'rotate(-7deg)' : 'rotate(0deg)';
+            const stmtSeal = document.getElementById('stmt-official-seal-host');
+            if (stmtSeal) {
+                stmtSeal.className = `${inkClass} -mr-9 -mb-1 z-20 pointer-events-none`;
+                stmtSeal.style.transform = rot;
+                stmtSeal.innerHTML = buildOfficialSealSVG('stmt', 132);
+            }
+            const rcptSeal = document.getElementById('rcpt-seal-host');
+            if (rcptSeal) {
+                rcptSeal.className = `${inkClass} shrink-0`;
+                rcptSeal.style.transform = rot;
+                rcptSeal.innerHTML = buildOfficialSealSVG('rcpt', 82);
+            }
+            const angleLabel = document.getElementById('seal-angle-btn-label');
+            if (angleLabel) angleLabel.textContent = state.preferences.sealAngled !== false ? 'Stamped (-7°)' : 'Formal (0°)';
+        }
+
+        // --- Subpage Renderer (Wallets, Transactions, Cards, Goals, Analytics, Settings, Support) ---
+        function renderSubpage(tabId) {
+            const heading = document.getElementById('subpage-heading');
+            const sub = document.getElementById('subpage-subtitle');
+            const host = document.getElementById('subpage-dynamic-content');
+
+            if (tabId === 'wallets') {
+                heading.textContent = 'My Wallets & Hisab Balances';
+                sub.textContent = 'Click any wallet to deposit funds or inspect balances';
+                host.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">${state.wallets.map(w => `
+                    <div class="rounded-3xl p-5 text-white bg-gradient-to-br ${w.grad} space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm">${w.name}</span>
+                            <i data-lucide="${w.icon}" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-2xl font-black font-mono">${fmtMoney(w.balance)}</div>
+                        <button onclick="openAddMoneyModal('${w.name}')" class="w-full py-2 rounded-xl bg-black/25 hover:bg-black/35 text-xs font-extrabold">+ Add Funds</button>
+                    </div>
+                `).join('')}</div>`;
+            } else if (tabId === 'transactions') {
+                heading.textContent = 'All Transactions & Hisab Ledger';
+                sub.textContent = 'Click any entry to view its Official Digital Receipt';
+                host.innerHTML = `<div class="vs-card rounded-3xl p-4 space-y-2.5">${state.activities.map(a => `
+                    <div onclick="openReceipt('${a.id}')" class="p-3 rounded-2xl hover:bg-emerald-500/10 cursor-pointer flex items-center justify-between border border-emerald-500/10">
+                        <div>
+                            <div class="text-sm font-bold">${a.title} <span class="text-[10px] font-mono vs-muted ml-1">#${a.id}</span></div>
+                            <div class="text-xs vs-muted">${a.time} • ${a.wallet} • ${a.category}</div>
+                        </div>
+                        <div class="font-mono font-extrabold ${a.type === 'in' ? 'text-emerald-400' : 'text-rose-400'}">${a.type === 'in' ? '+' : '-'}${fmtMoney(a.amount)}</div>
+                    </div>
+                `).join('')}</div>`;
+            } else if (tabId === 'cards') {
+                heading.textContent = 'VaultSpace Virtual Card';
+                sub.textContent = 'Switch metallic card finish or copy card details';
+                const themeClass = state.preferences.cardTheme === 'gold' ? 'v-card-gold' : (state.preferences.cardTheme === 'crimson' ? 'v-card-crimson' : 'v-card-emerald');
+                host.innerHTML = `
+                    <div class="max-w-md space-y-4">
+                        <div class="${themeClass} rounded-3xl p-6 text-white aspect-[1.586/1] flex flex-col justify-between shadow-2xl border border-white/20">
+                            <div class="flex items-center justify-between">
+                                <span class="font-black tracking-wider text-sm">VAULTSPACE INFINITE</span>
+                                <i data-lucide="wifi" class="w-5 h-5 rotate-90"></i>
+                            </div>
+                            <div class="font-mono text-lg sm:text-xl tracking-widest font-bold">4532 •••• •••• 8849</div>
+                            <div class="flex items-end justify-between text-xs">
+                                <div>
+                                    <div class="text-[10px] opacity-75 uppercase">Card Holder</div>
+                                    <div class="font-bold uppercase">${state.profile.name}</div>
+                                </div>
+                                <div class="font-mono">EXP 09/29 • CVV 742</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <button onclick="setVirtualCardTheme('emerald')" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">Emerald</button>
+                            <button onclick="setVirtualCardTheme('gold')" class="px-3.5 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold">Gold</button>
+                            <button onclick="setVirtualCardTheme('crimson')" class="px-3.5 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold">Crimson</button>
+                        </div>
+                    </div>
+                `;
+            } else if (tabId === 'goals') {
+                heading.textContent = 'Savings Goals & Targets';
+                sub.textContent = 'Track your milestones and boost progress';
+                host.innerHTML = `
+                    <div class="space-y-4">
+                        <button onclick="openModal('add-goal-modal')" class="px-4 py-2.5 rounded-2xl bg-emerald-500 text-slate-950 font-extrabold text-xs">+ Add New Goal</button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">${state.goals.map(g => {
+                            const pct = Math.min(100, Math.round((g.saved / g.target) * 100));
+                            return `<div class="vs-card rounded-3xl p-5 space-y-3">
+                                <div class="flex justify-between font-bold"><span>${g.title}</span><span class="font-mono text-emerald-400">${pct}%</span></div>
+                                <div class="w-full h-3 rounded-full bg-black/30 overflow-hidden"><div class="h-full bg-emerald-400 rounded-full" style="width:${pct}%"></div></div>
+                                <div class="flex justify-between text-xs font-mono vs-muted"><span>${fmtMoney(g.saved)} / ${fmtMoney(g.target)}</span><button onclick="boostGoalById('${g.id}', 5000)" class="text-emerald-400 font-sans font-bold">+ Boost ৳5,000</button></div>
+                            </div>`;
+                        }).join('')}</div>
+                    </div>
+                `;
+            } else {
+                heading.textContent = NAV_ITEMS.find(n => n.id === tabId)?.label || 'VaultSpace';
+                sub.textContent = 'Quick access to Hisab Saver, Official E-Statement, and Profile settings';
+                host.innerHTML = `
+                    <div class="vs-card rounded-3xl p-6 space-y-4">
+                        <p class="text-xs vs-muted leading-relaxed">Your Money. Our Priority. Manage your primary currency (BDT ৳ / SAR ﷼), inspect your official stamped statement, or update account holder details.</p>
+                        <div class="flex flex-wrap gap-2.5">
+                            <button onclick="toggleCurrency()" class="px-4 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold">Switch BDT / SAR</button>
+                            <button onclick="switchView('statement')" class="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 text-xs font-extrabold">View Official E-Statement</button>
+                            <button onclick="openModal('profile-modal')" class="px-4 py-2 rounded-xl vs-card text-xs font-bold">Edit Profile</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // --- Official Statement View ---
+        function renderOfficialStatementView() {
+            const totalBal = getTotalBalance();
+            document.getElementById('stmt-issue-date').textContent = new Date().toISOString().slice(0, 10);
+            document.getElementById('stmt-p-name').textContent = state.profile.name;
+            document.getElementById('stmt-p-handle').textContent = state.profile.handle;
+            document.getElementById('stmt-p-phone').textContent = state.profile.phone;
+            document.getElementById('stmt-p-ac').textContent = state.profile.acNumber;
+            document.getElementById('stmt-p-nominee').textContent = state.profile.nominee;
+            document.getElementById('stmt-p-bal').textContent = `৳ ${totalBal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('stmt-hash-code').textContent = `VS-${Math.abs(Math.round(totalBal) * 37 % 899999 + 100000).toString(16).toUpperCase()}`;
+
+            renderQRMatrix('stmt-qr-box', `${state.profile.acNumber}|${totalBal}`);
+            renderEmblemsAndSeals();
+
+            document.getElementById('stmt-rows-body').innerHTML = state.activities.map(a => `
+                <tr>
+                    <td class="py-2 px-2.5 text-slate-600">${a.date}</td>
+                    <td class="py-2 px-2.5 font-bold">${a.id}</td>
+                    <td class="py-2 px-2.5 font-sans">${a.title}</td>
+                    <td class="py-2 px-2.5 font-sans text-slate-600">${a.wallet}</td>
+                    <td class="py-2 px-2.5 text-right font-bold ${a.type === 'in' ? 'text-emerald-700' : 'text-rose-700'}">${a.type === 'in' ? '+' : '-'}৳ ${Number(a.amount).toLocaleString('en-IN')}</td>
+                </tr>
+            `).join('');
+        }
+
+        // --- Interactive Modals & State Mutators ---
+        function openModal(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            if (id === 'qr-modal') {
+                renderQRMatrix('qr-modal-matrix', `${state.profile.acNumber}|${state.profile.handle}`);
+            }
+            if (id === 'profile-modal') {
+                document.getElementById('cfg-name').value = state.profile.name;
+                document.getElementById('cfg-handle').value = state.profile.handle;
+                document.getElementById('cfg-phone').value = state.profile.phone;
+                document.getElementById('cfg-ac').value = state.profile.acNumber;
+                document.getElementById('cfg-nominee').value = state.profile.nominee;
+            }
+            lucide.createIcons();
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+
+        function openSendMoneyModal() {
+            document.getElementById('action-tx-title').textContent = 'Send Money';
+            document.getElementById('action-tx-type').value = 'out';
+            document.getElementById('action-tx-note').placeholder = 'Recipient name or transfer note...';
+            document.getElementById('action-tx-submit-btn').textContent = 'Send Now';
+            openModal('action-tx-modal');
+        }
+
+        function openAddMoneyModal(walletName = 'Personal') {
+            document.getElementById('action-tx-title').textContent = `Add Money — ${walletName}`;
+            document.getElementById('action-tx-type').value = 'in';
+            document.getElementById('action-tx-wallet').value = walletName;
+            document.getElementById('action-tx-note').placeholder = 'Deposit source or Hisab note...';
+            document.getElementById('action-tx-submit-btn').textContent = 'Add Money';
+            openModal('action-tx-modal');
+        }
+
+        function openPayBillsModal() {
+            document.getElementById('action-tx-title').textContent = 'Pay Bills & Recharge';
+            document.getElementById('action-tx-type').value = 'out';
+            document.getElementById('action-tx-category').value = 'Bills';
+            document.getElementById('action-tx-note').placeholder = 'Electricity, Wi-Fi, or Mobile Recharge...';
+            document.getElementById('action-tx-submit-btn').textContent = 'Pay Bill';
+            openModal('action-tx-modal');
+        }
+
+        function openMoreHisabModal() {
+            openModal('more-hisab-modal');
+        }
+
+        function submitActionTransaction(e) {
+            e.preventDefault();
+            const type = document.getElementById('action-tx-type').value;
+            const walletName = document.getElementById('action-tx-wallet').value;
+            const note = document.getElementById('action-tx-note').value.trim();
+            const amount = parseFloat(document.getElementById('action-tx-amount').value);
+            const category = document.getElementById('action-tx-category').value;
+            if (!amount || amount <= 0) return;
+
+            const w = state.wallets.find(item => item.name === walletName) || state.wallets[0];
+            if (type === 'in') {
+                w.balance = Number(w.balance) + amount;
+            } else {
+                w.balance = Number(w.balance) - amount;
+                state.spendingBreakdown.totalSpent = Number(state.spendingBreakdown.totalSpent) + amount;
+            }
+
+            state.activities.unshift({
+                id: 'VS-' + Math.floor(300 + Math.random() * 699),
+                title: note,
+                time: 'Just now',
+                date: new Date().toISOString().slice(0, 10),
+                wallet: w.name,
+                category,
+                type,
+                amount,
+                icon: type === 'in' ? 'arrow-down-left' : 'send',
+                badgeBg: type === 'in' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'
+            });
+
+            document.getElementById('action-tx-note').value = '';
+            document.getElementById('action-tx-amount').value = '';
+            persistState();
+            closeModal('action-tx-modal');
+            refreshUI();
+            notify(type === 'in' ? `Added ${fmtMoney(amount)} to ${w.name}` : `Sent ${fmtMoney(amount)} from ${w.name}`);
+        }
+
+        function submitHisabEntry(e) {
+            e.preventDefault();
+            const kind = document.querySelector('input[name="hisabKind"]:checked').value;
+            const note = document.getElementById('hisab-note-input').value.trim();
+            const amount = parseFloat(document.getElementById('hisab-amount-input').value);
+            const category = document.getElementById('hisab-cat-input').value;
+            if (!amount || amount <= 0) return;
+
+            const isCredit = kind === 'income';
+            const personalWallet = state.wallets[0];
+            if (kind === 'income') personalWallet.balance = Number(personalWallet.balance) + amount;
+            if (kind === 'expense') personalWallet.balance = Number(personalWallet.balance) - amount;
+
+            state.activities.unshift({
+                id: 'HS-' + Math.floor(100 + Math.random() * 899),
+                title: `${note} (${kind.replace('_', ' ').toUpperCase()})`,
+                time: 'Today',
+                date: new Date().toISOString().slice(0, 10),
+                wallet: personalWallet.name,
+                category,
+                type: isCredit ? 'in' : 'out',
+                amount,
+                icon: 'book-open',
+                badgeBg: 'bg-emerald-500/15 text-emerald-400'
+            });
+
+            document.getElementById('hisab-note-input').value = '';
+            document.getElementById('hisab-amount-input').value = '';
+            persistState();
+            closeModal('more-hisab-modal');
+            refreshUI();
+            notify('Hisab entry recorded!');
+        }
+
+        function simulateQRPayment() {
+            state.wallets[0].balance = Number(state.wallets[0].balance) + 500;
+            state.activities.unshift({
+                id: 'QR-' + Math.floor(100 + Math.random() * 899),
+                title: 'QR Instant Credit',
+                time: 'Just now',
+                date: new Date().toISOString().slice(0, 10),
+                wallet: 'Personal',
+                category: 'Others',
+                type: 'in',
+                amount: 500,
+                icon: 'scan-line',
+                badgeBg: 'bg-emerald-500/15 text-emerald-400'
+            });
+            persistState();
+            closeModal('qr-modal');
+            refreshUI();
+            notify('Received +৳ 500 via Scan QR!');
+        }
+
+        function submitNewGoal(e) {
+            e.preventDefault();
+            const title = document.getElementById('goal-title-input').value.trim();
+            const saved = parseFloat(document.getElementById('goal-saved-input').value) || 0;
+            const target = parseFloat(document.getElementById('goal-target-input').value) || 100000;
+            state.goals.unshift({ id: 'g-' + Date.now(), title, saved, target });
+            document.getElementById('goal-title-input').value = '';
+            persistState();
+            closeModal('add-goal-modal');
+            refreshUI();
+            notify(`Goal "${title}" added!`);
+        }
+
+        function boostFirstGoal(amt) {
+            if (!state.goals.length) return;
+            state.goals[0].saved = Number(state.goals[0].saved) + amt;
+            persistState();
+            refreshUI();
+            notify(`Boosted ${state.goals[0].title} by +৳${amt.toLocaleString('en-IN')}`);
+        }
+
+        function boostGoalById(id, amt) {
+            const g = state.goals.find(item => item.id === id);
+            if (!g) return;
+            g.saved = Number(g.saved) + amt;
+            persistState();
+            refreshUI();
+            renderSubpage('goals');
+            lucide.createIcons();
+            notify(`Boosted ${g.title} by +৳${amt.toLocaleString('en-IN')}`);
+        }
+
+        function openReceipt(id) {
+            const act = state.activities.find(a => a.id === id);
+            if (!act) return;
+            document.getElementById('rcpt-amount-val').textContent = `${act.type === 'in' ? '+' : '-'}৳ ${Number(act.amount).toLocaleString('en-IN')}`;
+            document.getElementById('rcpt-title-val').textContent = act.title;
+            document.getElementById('rcpt-id-val').textContent = `#${act.id}`;
+            document.getElementById('rcpt-time-val').textContent = act.time;
+            document.getElementById('rcpt-wallet-val').textContent = act.wallet;
+            document.getElementById('rcpt-cat-val').textContent = act.category;
+            openModal('receipt-modal');
+        }
+
+        function toggleBalanceHidden() {
+            state.preferences.balanceHidden = !state.preferences.balanceHidden;
+            persistState();
+            refreshUI();
+        }
+
+        function toggleCurrency() {
+            state.preferences.currency = state.preferences.currency === 'BDT' ? 'SAR' : 'BDT';
+            persistState();
+            refreshUI();
+            notify(`Switched currency to ${state.preferences.currency}`);
+        }
+
+        
+
+        function toggleThemeMode() {
+            state.preferences.darkMode = !state.preferences.darkMode;
+            persistState();
+            applyThemeMode();
+        }
+
+        function applyThemeMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-mode-icon');
+            if (state.preferences.darkMode) {
+                html.classList.remove('light-mode');
+                html.classList.add('dark');
+                if (icon) icon.setAttribute('data-lucide', 'moon');
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light-mode');
+                if (icon) icon.setAttribute('data-lucide', 'sun');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleNotificationsPopover() {
+            document.getElementById('notifications-popover').classList.toggle('hidden');
+        }
+
+        function markNotificationsRead() {
+            document.getElementById('notif-badge-count').textContent = '0';
+            document.getElementById('notifications-popover').classList.add('hidden');
+            notify('All notifications marked as read');
+        }
+
+        function setOfficialSealInk(ink) {
+            state.preferences.sealInk = ink;
+            persistState();
+            renderEmblemsAndSeals();
+        }
+
+        function toggleOfficialSealAngle() {
+            state.preferences.sealAngled = !(state.preferences.sealAngled !== false);
+            persistState();
+            renderEmblemsAndSeals();
+        }
+
+        function setVirtualCardTheme(theme) {
+            state.preferences.cardTheme = theme;
+            persistState();
+            renderSubpage('cards');
+            lucide.createIcons();
+            notify(`Card theme set to ${theme.toUpperCase()}`);
+        }
+
+        function activatePremiumPerk() {
+            closeModal('premium-modal');
+            notify('VaultSpace Premium perks active on your account!');
+        }
+
+        function copyReferralCode() {
+            const code = document.getElementById('referral-code-text').textContent;
+            const ta = document.createElement('textarea');
+            ta.value = code;
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                notify('Referral code copied!');
+            } catch (e) {
+                notify('Copy ready: ' + code);
+            }
+            document.body.removeChild(ta);
+        }
+
+        function claimReferralBonus() {
+            state.wallets[0].balance = Number(state.wallets[0].balance) + 100;
+            state.activities.unshift({
+                id: 'RF-' + Math.floor(100 + Math.random() * 899),
+                title: 'Referral Bonus Credit',
+                time: 'Just now',
+                date: new Date().toISOString().slice(0, 10),
+                wallet: 'Personal',
+                category: 'Others',
+                type: 'in',
+                amount: 100,
+                icon: 'gift',
+                badgeBg: 'bg-emerald-500/15 text-emerald-400'
+            });
+            persistState();
+            closeModal('refer-modal');
+            refreshUI();
+            notify('Claimed +৳ 100 Referral Bonus!');
+        }
+
+        function saveProfileModal(e) {
+            e.preventDefault();
+            state.profile.name = document.getElementById('cfg-name').value.trim();
+            state.profile.handle = document.getElementById('cfg-handle').value.trim();
+            state.profile.phone = document.getElementById('cfg-phone').value.trim();
+            state.profile.acNumber = document.getElementById('cfg-ac').value.trim();
+            state.profile.nominee = document.getElementById('cfg-nominee').value.trim();
+            persistState();
+            closeModal('profile-modal');
+            refreshUI();
+            notify('Profile saved!');
+        }
+
+        function switchActiveAccount() {
+            openModal('profile-modal');
+            notify('Select or update active VaultSpace account');
+        }
+
+        function resetDemoState() {
+            state = JSON.parse(JSON.stringify(INITIAL_STATE));
+            persistState();
+            closeModal('profile-modal');
+            refreshUI();
+            notify('Restored default VaultSpace balances & Hisab');
+        }
+
+        function handleGlobalSearch(q) {
+            const panel = document.getElementById('search-results-panel');
+            const list = document.getElementById('search-results-list');
+            const term = (q || '').trim().toLowerCase();
+            if (!term) {
+                panel.classList.add('hidden');
+                return;
+            }
+            const matches = [];
+            state.wallets.forEach(w => {
+                if (w.name.toLowerCase().includes(term)) matches.push({ label: `Wallet: ${w.name}`, val: fmtMoney(w.balance), onClick: `switchView('wallets')` });
+            });
+            state.goals.forEach(g => {
+                if (g.title.toLowerCase().includes(term)) matches.push({ label: `Goal: ${g.title}`, val: fmtMoney(g.saved), onClick: `switchView('goals')` });
+            });
+            state.activities.forEach(a => {
+                if (a.title.toLowerCase().includes(term) || a.id.toLowerCase().includes(term)) matches.push({ label: `${a.title} (#${a.id})`, val: fmtMoney(a.amount), onClick: `openReceipt('${a.id}')` });
+            });
+            panel.classList.remove('hidden');
+            list.innerHTML = matches.length
+                ? matches.slice(0, 6).map(m => `<button onclick="${m.onClick}" class="p-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-left flex items-center justify-between"><span class="font-semibold truncate">${m.label}</span><span class="font-mono font-bold text-emerald-400 ml-2">${m.val}</span></button>`).join('')
+                : `<div class="text-xs vs-muted col-span-3">No matching items for "${q}"</div>`;
+        }
+
+        function clearGlobalSearch() {
+            document.getElementById('global-search-input').value = '';
+            document.getElementById('search-results-panel').classList.add('hidden');
+        }
+
+        function exportLedgerCSV() {
+            const rows = [['Ref ID', 'Date', 'Title', 'Wallet', 'Category', 'Type', 'Amount (BDT)']].concat(
+                state.activities.map(a => [a.id, a.date, `"${a.title.replace(/"/g, '""')}"`, a.wallet, a.category, a.type, a.amount])
+            );
+            const uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(rows.map(r => r.join(',')).join('\n'));
+            const link = document.createElement('a');
+            link.href = uri;
+            link.download = `VaultSpace_Statement_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            notify('Exported CSV statement!');
+        }
+
+        function refreshUI() {
+            applyThemeMode();
+            renderSidebarNav();
+            renderProfileIdentity();
+            renderDashboardMetrics();
+            renderWalletsGrid();
+            renderFeaturedGoal();
+            renderRecentActivity();
+            renderEmblemsAndSeals();
+            lucide.createIcons();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshUI();
+        });
+    </script>
+</body>
+</html>
+                      
+                
